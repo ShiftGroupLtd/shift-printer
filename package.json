@@ -13,7 +13,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "build": "electron-builder build --win --publish never",
-    "deploy": "electron-builder build --win --publish always",
+    "deploy": "electron-builder build --win --publish always"
   },
   "keywords": [],
   "author": "Brent French",
