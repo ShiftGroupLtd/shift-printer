@@ -1,12 +1,12 @@
 {
   "name": "shift-printer",
   "productName": "shift-printer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shift Printer",
   "main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/shiftkiosk/shift-printer"
+    "url": "https://github.com/ShiftGroupLtd/shift-printer"
   },
   "scripts": {
     "start": "electron-forge start",

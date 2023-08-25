@@ -1,13 +1,18 @@
 const ipc = require('electron').ipcRenderer;
+const version = document.getElementById('version');
+const notification = document.getElementById('notification');
+const message = document.getElementById('message');
+const restartButton = document.getElementById('restart-button');
+const authButton = document.getElementById("authenticate-button");
 
 ipc.send('variable-request');
+ipc.send('checkLoader');
+ipc.send('app_version');
 
 ipc.on('actionReplySuccess', function (event, response) {
     document.getElementById("loadingBg").remove();
 });
 
-
-ipc.send('checkLoader');
 
 ipc.on('closeLoader', function (event, response) {
     document.getElementById("loadingBg").remove();
@@ -24,7 +29,6 @@ ipc.on('printerList', function (event, response) {
     })
 });
 
-const authButton = document.getElementById("authenticate-button");
 if(authButton) {
     authButton.addEventListener("click", () => {
         ipc.once('actionReply', (event, response) => {
@@ -48,3 +52,28 @@ document.getElementById("submitBtn").addEventListener('click', () => {
     let = formList = document.getElementById('select-form'); 
     ipc.send('invokeAction', [formList.options[formList.selectedIndex].value, document.getElementById("accountNumber").value]);
 });
+
+ipc.on('app_version', (event, arg) => {
+    ipc.removeAllListeners('app_version');
+    version.innerText = 'Version ' + arg.version;
+});
+
+ipc.on('update_available', () => {
+    ipc.removeAllListeners('update_available');
+    message.innerText = 'A new update is available. Downloading now...';
+    notification.classList.remove('hidden');
+});
+
+ipc.on('update_downloaded', () => {
+    ipc.removeAllListeners('update_downloaded');
+    message.innerText = 'Update Downloaded. It will be installed on restart. Restart now?';
+    restartButton.classList.remove('hidden');
+    notification.classList.remove('hidden');
+});
+
+function closeNotification() {
+    notification.classList.add('hidden');
+}
+function restartApp() {
+    ipcRenderer.send('restart_app');
+}
