@@ -3,7 +3,6 @@ const version = document.getElementById('version');
 const notification = document.getElementById('notification');
 const message = document.getElementById('message');
 const restartButton = document.getElementById('restart-button');
-const authButton = document.getElementById("authenticate-button");
 
 ipc.send('variable-request');
 ipc.send('checkLoader');
@@ -19,27 +18,11 @@ ipc.on('closeLoader', function (event, response) {
 });
 
 ipc.on('printerList', function (event, response) {
-    let sel = document.querySelector('.form-select');
-    response.forEach((item) => {
-        let opt = document.createElement('option');
-        opt.value = item.deviceId;
-        let option = document.createTextNode(item.deviceId);
-        opt.appendChild(option);
-        sel.appendChild(opt);
-    })
 });
 
-if(authButton) {
-    authButton.addEventListener("click", () => {
-        ipc.once('actionReply', (event, response) => {
-            console.log("Hello world!", response);
-        })
-        ipc.send('invokeAction');
-    });
-}
-
-document.getElementById("accountNumber").addEventListener('input', (item) => {
-    if(item.data >= 1){
+document.getElementById("printer").addEventListener('input', (item) => {
+    text = document.getElementById("printer").value;
+    if(text.length >= 1){
         document.getElementById("submitBtn").disabled = false;
         document.getElementById("submitBtn").className = 'btn btn-primary'; 
     } else {
@@ -48,10 +31,17 @@ document.getElementById("accountNumber").addEventListener('input', (item) => {
     }
 });
 
-document.getElementById("submitBtn").addEventListener('click', () => {
+document.getElementById("submitBtn").addEventListener('click', (event) => {
+    event.preventDefault();
     let = formList = document.getElementById('select-form'); 
-    ipc.send('invokeAction', [formList.options[formList.selectedIndex].value, document.getElementById("accountNumber").value]);
+    ipc.send('invokeAction', [document.getElementById("printer").value]);
 });
+
+document.getElementById("version").addEventListener('click', (event) => {
+    ipc.send('logout', true);
+});
+
+
 
 ipc.on('app_version', (event, arg) => {
     ipc.removeAllListeners('app_version');
@@ -77,3 +67,18 @@ function closeNotification() {
 function restartApp() {
     ipcRenderer.send('restart_app');
 }
+
+
+window.addEventListener(
+    "message",
+    (event) => {
+        if (event.origin !== "https://app.shift.online") {
+            return;
+        }
+
+        if (event.data.token) {
+            ipc.send('setToken', [event.data.token, event.data.accountId]);
+        }
+    }
+);
+

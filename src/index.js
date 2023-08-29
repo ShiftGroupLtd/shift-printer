@@ -10,7 +10,6 @@ const hostName = require('os').hostname();
 const { ipcMain } = require('electron');
 const ipc = require('electron').ipcMain;
 
-
 const execPromise = (command, count = 1, log = 'label') => {
   const promises = [];
   for (i = 0; i < count; ++i) {
@@ -38,10 +37,12 @@ const createWindow = async() => {
       }
     }
   );
-  //mainWindow.webContents.openDevTools();
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
-  mainWindow.webContents.executeJavaScript(`document.getElementById("iframe").setAttribute('src', 'https://app.shift.online')`);
 
+  mainWindow.webContents.openDevTools();
+
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  mainWindow.webContents.executeJavaScript(`document.getElementById("iframe").setAttribute('src', 'https://app.shift.online')`);
 
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify();
@@ -58,8 +59,15 @@ const createWindow = async() => {
 
 app.on('ready', createWindow);
 
+
+ipcMain.on('logout', async function (event, arg) {
+  await settings.unset('auth');
+  await settings.unset('printer');
+  app.exit();
+  app.relaunch();
+});
+
 ipc.on('app_version', (event) => {
-  console.log('triggered')
   event.sender.send('app_version', { version: app.getVersion() });
 });
 
@@ -68,55 +76,77 @@ ipc.on('restart_app', () => {
 });
 
 ipc.on('invokeAction', async (event, data) => {
-  if(data.length && data.length == 2) {
-    startPrinter(data[0], data[1]);
-    await settings.set('settings', {
-      printerId: data[0],
-      accountId: data[1]
+  if(data.length) {
+    await settings.set('printer', {
+      name: data[0],
     });
     return event.sender.send('actionReplySuccess');
   }
   return  event.sender.send('actionReplyFail');
 });
 
-ipcMain.on('checkLoader', async function (event, arg) {
-  //await settings.unset('settings');
-  accountId = await settings.has('settings.accountId');
-  printerId = await settings.has('settings.printerId');
-  if(accountId && printerId) {
-    startPrinter(await settings.get('settings.accountId'),  await settings.get('settings.printerId'));
-    event.sender.send('closeLoader');
-  } else {
-    printerList = await getPrinters();
-    event.sender.send('printerList', printerList);
+
+ipc.on('setToken', async (event, data) => {
+  if(data.length && data.length == 2) {
+    await settings.set('auth', {
+      token: data[0],
+      accountId: data[1],
+    });
+    console.log('set token...');
   }
 });
 
-const startPrinter = async () => {
-  // setInterval(async() => {
-  //   try {
-  //     const config = {
-  //       method: 'post',
-  //       url: 'https://api.shift.online/printer/v1/qr_pending?location=' +  'test',
-  //       headers: { 
-  //           'Authorization': "****"
-  //       }
-  //     };
+ipcMain.on('checkLoader', async function (event, arg) {
+  startPrinter();
 
-  //     const response = await axios(config);
-  //     let { data }  = await response.data;
-  //     await data.forEach(async(item, count) => {
-  //       // Write File
-  //       await fs.writeFileSync(path.join(__dirname,"zplStorage", item.qr_id + "_" + count + ".txt"), item.zpl,"UTF8",{ flag: 'wx' })
-  //        // Print File
-  //       await execPromise('COPY /B '+ path.join(__dirname,"zplStorage", item.qr_id + "_" + count + ".txt") + ' "\\\\' + hostName + '\\' + await settings.get('settings.printerId')+'"', 1);
-  //       // Delete File
-  //       fs.unlink(path.join(__dirname,"zplStorage", item.qr_id + "_" + count + ".txt"), function (err) {
-  //           if (err) throw err;
-  //       });
-  //     });
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }, 2000);  
+  //if printer name is set close it
+  printerName = await settings.has('printer.name');
+  if(!printerName) {
+    return;
+  } 
+  event.sender.send('closeLoader');
+});
+
+const startPrinter = async () => {
+  const loopStart = setInterval(async() => {
+    try {
+      authToken = await settings.has('auth.token');
+      accountId =  await settings.has('auth.accountId');
+      printerName = await settings.has('printer.name');
+
+      if(!authToken || !accountId || !printerName) {
+        return;
+      } 
+
+      authToken = await settings.get('auth.token');
+      accountId =  await settings.get('auth.accountId');
+      printerName = await settings.get('printer.name');
+
+      //console.log(await settings.has('auth.token'), await settings.has('auth.accountId'), await settings.has('printer.name'));
+      const config = {
+        method: 'post',
+        url: 'https://api.shift.online/business-dashboard/v1/printer/autoPrint',
+        headers: { 
+            'Authorization': "Bearer " + authToken
+        },
+        data : {
+          accountId : accountId
+        }
+      };
+
+      const response = await axios(config);
+      await response.data.forEach(async(item, count) => {
+        // Write File
+        await fs.writeFileSync(path.join(__dirname,"zplStorage", count + ".txt"), item ,"UTF8",{ flag: 'wx' })
+        // Print File
+        await execPromise('COPY /B '+ path.join(__dirname, "zplStorage", count + ".txt") + ' "\\\\' + hostName + '\\' + printerName +'"', 1);
+        // Delete File
+        fs.unlink(path.join(__dirname,"zplStorage", count + ".txt"), function (err) {
+            if (err) throw err;
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, 2000);
 }

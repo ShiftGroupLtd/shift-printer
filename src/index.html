@@ -10,21 +10,16 @@
     <div id="loadingBg" class="loadingBg">
       <div class="loading">
         <form  style="width:400px">
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Select Zebra Printer</label>
-            <select id="select-form" class="form-select" aria-label="Default select example">
-            </select>
-          </div>
           <div  class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">Account ID</label>
-            <input type="email" class="form-control" id="accountNumber">
+            <label class="form-label">Shared Printer Name</label>
+            <label class="form-label" style="font-size: 11px; clear:both;width: 270px;">To get the shared printer name, follow this <a target="_blank" href="https://docs.google.com/document/d/19A2Frl8SKm_D8gdSEfQ_bkkpelPfRq7UxwwaOlmDr9o">link</a></label>
+            <input type="input" class="form-control" id="printer">
           </div>
           <button style="float:right" type="submit" disabled  id="submitBtn" class="btn">Start</button>
         </form>
       </div>
     </div>
-    <p id="version">sssss</p>
-
+    <p id="version"></p>
     <div id="notification" class="hidden">
       <p id="message"></p>
       <button id="close-button" onClick="closeNotification()">

@@ -1,7 +1,7 @@
 {
   "name": "shift-printer",
   "productName": "shift-printer",
-  "version": "1.0.2",
+  "version": "1.2.0",
   "description": "Shift Printer",
   "main": "src/index.js",
   "repository": {
