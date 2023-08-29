@@ -41,8 +41,6 @@ document.getElementById("version").addEventListener('click', (event) => {
     ipc.send('logout', true);
 });
 
-
-
 ipc.on('app_version', (event, arg) => {
     ipc.removeAllListeners('app_version');
     version.innerText = 'Version ' + arg.version;
@@ -61,13 +59,9 @@ ipc.on('update_downloaded', () => {
     notification.classList.remove('hidden');
 });
 
-function closeNotification() {
-    notification.classList.add('hidden');
-}
-function restartApp() {
-    ipcRenderer.send('restart_app');
-}
-
+ipc.on('error', (error, message) => {
+   console.log(message);
+});
 
 window.addEventListener(
     "message",
