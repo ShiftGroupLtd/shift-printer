@@ -1,0 +1,4 @@
+appId: com.shift.printer
+publish:
+  provider: github
+  token: KEY
