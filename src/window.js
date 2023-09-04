@@ -3,6 +3,10 @@ const version = document.getElementById('version');
 const notification = document.getElementById('notification');
 const message = document.getElementById('message');
 const restartButton = document.getElementById('restart-button');
+const advancedSettingsBtn = document.getElementById("advancedSettingsBtn")
+const advancedSettings = document.getElementById('advancedSettings');
+const ftpSettingsWarning = document.getElementById('ftpSettingsWarning');
+const ftpSettingsSuccess = document.getElementById('ftpSettingsSuccess');
 
 ipc.send('variable-request');
 ipc.send('checkLoader');
@@ -12,6 +16,22 @@ ipc.on('actionReplySuccess', function (event, response) {
     document.getElementById("loadingBg").remove();
 });
 
+ipc.on('ftpDetails', function (event, response) {
+    try {
+        console.log('Recieved FTP details', {response})
+        const {ftpHost, ftpUsername, ftpPassword, ftpPath, ftpPort} = response
+
+        document.getElementById('ftp_host').value = ftpHost
+        document.getElementById('ftp_username').value = ftpUsername
+        document.getElementById('ftp_password').value = ftpPassword
+        document.getElementById('ftp_path').value = ftpPath
+        document.getElementById('ftp_port').value = ftpPort
+        advancedSettings.style.display = 'block';
+    }
+    catch (err) {
+        console.error(err)
+    }
+});
 
 ipc.on('closeLoader', function (event, response) {
     document.getElementById("loadingBg").remove();
@@ -33,8 +53,60 @@ document.getElementById("printer").addEventListener('input', (item) => {
 
 document.getElementById("submitBtn").addEventListener('click', (event) => {
     event.preventDefault();
-    let = formList = document.getElementById('select-form'); 
+    let formList = document.getElementById('select-form');
     ipc.send('invokeAction', [document.getElementById("printer").value]);
+
+    // todo: If FTP entered, then send to index.js
+    // todo: invokeFTPAction
+});
+
+advancedSettingsBtn.addEventListener('click', (event) => {
+    const display = {block: 'none', none: 'block'}
+    const text = {block: 'Advanced Settings', none: 'Hide Advanced Settings'}
+    advancedSettingsBtn.innerText = text[advancedSettings.style.display]
+    advancedSettings.style.display = display[advancedSettings.style.display]
+});
+
+document.getElementById("saveFtpSettingsBtn").addEventListener('click', (event) => {
+    try {
+        ftpSettingsWarning.style.display = 'none';
+        ftpSettingsSuccess.style.display = 'none';
+
+        const errors = [];
+        const ftpHost = document.getElementById('ftp_host').value,
+            ftpUsername = document.getElementById('ftp_username').value,
+            ftpPassword = document.getElementById('ftp_password').value,
+            ftpPath = document.getElementById('ftp_path').value,
+            ftpPort = document.getElementById('ftp_port').value;
+
+        if(ftpHost.length === 0) {
+            errors.push('Please enter your FTP host')
+        }
+        if (ftpUsername.length === 0) {
+            errors.push('Please enter your FTP username')
+        }
+        if (ftpPassword.length === 0) {
+            errors.push('Please enter your FTP password')
+        }
+        if (ftpPath.length === 0) {
+            errors.push('Please enter your FTP folder path')
+        }
+        if(ftpPort.length === 0) {
+            errors.push('Please enter your FTP port')
+        }
+
+        if (errors.length) {
+            ftpSettingsWarning.style.display = 'block';
+            ftpSettingsWarning.innerHTML = '<ul class="list-group">' + errors.map((error) => `<li class="list-group-item">${error}</li>`).join('') + '</ul>';
+            return;
+        }
+
+        ipc.send('updateFTPDetails', [ftpHost, ftpUsername, ftpPassword, ftpPath, parseInt(ftpPort)]);
+        ftpSettingsSuccess.style.display = 'block';
+    }
+    catch (err) {
+        console.error(err)
+    }
 });
 
 document.getElementById("version").addEventListener('click', (event) => {

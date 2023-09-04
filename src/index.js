@@ -9,7 +9,14 @@ const { exec } = require("child_process");
 const hostName = require('os').hostname();
 const { ipcMain } = require('electron');
 const ipc = require('electron').ipcMain;
+const fileWatcherService = require('./services/fileWatcher').default;
+const getFtpDetailsService = require('./services/ftpDetails').getSftpDetails;
+const updateFtpDetailsService = require('./services/ftpDetails').updateSftpDetails;
+const getSftpClient = require('./services/sftp').getClient;
 
+// try {
+//   require('electron-reloader')(module)
+// } catch (_) {}
 
 const createWindow = async() => {
   const mainWindow = new BrowserWindow({
@@ -23,14 +30,17 @@ const createWindow = async() => {
     }
   );
 
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   mainWindow.webContents.executeJavaScript(`document.getElementById("iframe").setAttribute('src', 'https://app.shift.online')`);
 
-  mainWindow.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify();
+  mainWindow.once('ready-to-show', async () => {
+    await autoUpdater.checkForUpdatesAndNotify();
+    await sendFTPSettings()
+    await startFileWatcher()
+    await connectSFTP()
   });
 
   autoUpdater.on('update-available', () => {
@@ -66,9 +76,17 @@ const createWindow = async() => {
     return  event.sender.send('actionReplyFail');
   });
 
+  /**
+   * Update new FTP credentials
+   */
+  ipc.on('updateFTPDetails', async (event, data) => {
+    const [ftpHost, ftpUsername, ftpPassword, ftpPath, ftpPort] = data
+    await updateFtpDetailsService({ ftpHost, ftpUsername, ftpPassword, ftpPath, ftpPort })
+    //todo: We should disconnect from sftp, and reconnect here when this is updated
+  });
 
   ipc.on('setToken', async (event, data) => {
-    if(data.length && data.length == 2) {
+    if(data.length && data.length === 2) {
       await settings.set('auth', {
         token: data[0],
         accountId: data[1],
@@ -88,7 +106,14 @@ const createWindow = async() => {
     event.sender.send('closeLoader');
   });
 
-  
+
+  /**
+   * todo: description
+   * @param command
+   * @param count
+   * @param log
+   * @returns {Promise<Awaited<unknown>[]>}
+   */
   const execPromise = (command, count = 1, log = 'label') => {
     const promises = [];
     for (i = 0; i < count; ++i) {
@@ -106,6 +131,10 @@ const createWindow = async() => {
     return Promise.all(promises);
   }
 
+  /**
+   * todo: description
+   * @returns {Promise<void>}
+   */
   const startPrinter = async () => {
     const loopStart = setInterval(async() => {
       try {
@@ -151,7 +180,52 @@ const createWindow = async() => {
       }
     }, 2000);
   }
+
+  /**
+   * Send FTP details to frontend to show in the UI.
+   */
+  // Send saved FTP details
+  async function sendFTPSettings() {
+    const ftpDetails = await getFtpDetailsService();
+    console.log('Sending FTP details', ftpDetails)
+
+    if (!ftpDetails) {
+      console.log('Skipping sending FTP details')
+    }
+
+    mainWindow.webContents.send('ftpDetails', ftpDetails)
+  }
+
+  /**
+   * Start monitoring files
+   */
+  async function startFileWatcher() {
+    const ftpDetails = await getFtpDetailsService()
+
+    if(!ftpDetails) {
+      return;
+    }
+
+    const {
+      ftpPath: path
+    } = ftpDetails
+
+    fileWatcherService({path})
+  }
+
+  /**
+   * Establish connection to ftp server
+   */
+  async function connectSFTP()
+  {
+    await getSftpClient()
+  }
+
+  function log(str) {
+    mainWindow.webContents.send('error', str);
+  }
 };
 
 app.on('ready', createWindow);
+
 
