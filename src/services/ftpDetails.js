@@ -3,7 +3,7 @@ const settings = require("electron-settings");
 const settingsKey = 'ftpSettings';
 
 /**
- * @returns {Promise<{ftpHost: string, ftpUsername: string, ftpPassword: string, ftpPath: string, ftpPort: number}|null>}
+ * @returns {Promise<{ftpHost: string, ftpUsername: string, ftpPassword: string, ftpPath: string, ftpPort: number, ftpTargetPath: string}|null>}
  */
 async function getSftpDetails()
 {
@@ -11,16 +11,33 @@ async function getSftpDetails()
         return null;
     }
 
-    return await settings.get(settingsKey)
+    const defaults = {
+        ftpPath: 'C:\\',
+        ftpTargetPath: '/'
+    }
+
+    const data = await settings.get(settingsKey)
+
+    return {
+        ...defaults,
+        ...data
+    }
 }
 
-async function updateSftpDetails({ ftpHost, ftpUsername, ftpPassword, ftpPath, ftpPort })
+async function updateSftpDetails({ ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort })
 {
+    // Remove trailing / on ftpTargetPath
+    // It as added on automatically when it comes to uploading.
+    if (ftpTargetPath.endsWith('/')) {
+        ftpTargetPath = ftpTargetPath.slice(0, -1);
+    }
+
     await settings.set(settingsKey, {
         ftpHost,
         ftpUsername,
         ftpPassword,
         ftpPath,
+        ftpTargetPath,
         ftpPort,
     })
 }

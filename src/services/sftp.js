@@ -1,40 +1,32 @@
 const Client = require('ssh2-sftp-client');
 const sftp = new Client();
-const getFtpDetails = require('./ftpDetails').getSftpDetails;
 
 module.exports.client = null;
 
-const getClient = async () => {
+const getClient = () => sftp;
 
-    const ftpDetails = await getFtpDetails()
-
-    const {
-        ftpHost: host,
-        ftpUsername: username,
-        ftpPassword: password,
-        ftpPort: port
-    } = ftpDetails
-
-    if(!module.exports.client) {
-        module.exports.client = await connect({ host, username, password, port })
-    }
-
-    return module.exports.client
-}
 const connect = async ({ host, port, username, password }) => {
-    try {
-        return await sftp.connect({
-            host,
-            port,
-            username,
-            password
-        });
+    return await sftp.connect({
+        host,
+        port,
+        username,
+        password
+    });
+}
+
+const validatePath = async (path) => {
+    const client = getClient()
+    const remotePathExists = await client.exists(path);
+
+    if (!remotePathExists) {
+        throw new Error('Target folder path does not exist on the remote server');
     }
-    catch (err) {
-        console.log('sftp error', err)
-    }
+
+    await client.end();
 }
 
 module.exports = {
+    connect,
     getClient,
+    validatePath,
 }

@@ -29,10 +29,6 @@ p#version {
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column; 
-  align-items: center;
   background-color: white;
 }
 
@@ -48,4 +44,32 @@ p#version {
 }
 .hidden {
   display: none;
+}
+
+#sftpStatus {
+  position:fixed;
+  top:0;
+  left:0;
+  font-size:12px;
+  padding:5px 10px;
+  border:1px solid #ccc;
+  border-radius:30px;
+  margin:10px 0 0 10px;
+}
+#sftpStatus.success {
+  background:#b2f0b2;
+  color:#206820;
+}
+#sftpStatus.danger {
+  background:#f0b2b2;
+  color:#904a4a;
+}
+#sftpStatus.warning {
+  background:#f0d4b2;
+  color:#895416;
+}
+.small-text {
+  font-size:11px;
+  clear:both;
+  width:270px;
 }

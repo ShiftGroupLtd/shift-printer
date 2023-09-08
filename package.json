@@ -29,6 +29,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-updater": "^5.0.1",
     "electron-webpack": "^2.8.2",
+    "mime": "^3.0.0",
     "pdf-to-printer": "^5.6.0",
     "ssh2-sftp-client": "^9.1.0"
   },
