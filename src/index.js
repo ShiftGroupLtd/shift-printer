@@ -52,7 +52,7 @@ const createWindow = async() => {
 
     devToolsListener({ mainWindow })
 
-    printerValueListener()
+    printerValueListener({ mainWindow })
 
     ftpListener({ mainWindow })
 

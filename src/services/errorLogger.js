@@ -23,7 +23,16 @@ const logError = (err, message= '') => {
     browserWindow.webContents.send('error', {err,message})
 }
 
+const logInfo = (info) => {
+    if(!browserWindow) {
+        return;
+    }
+
+    browserWindow.webContents.send('error', info)
+}
+
 module.exports = {
     useErrorLogger,
-    logError
+    logError,
+    logInfo
 }

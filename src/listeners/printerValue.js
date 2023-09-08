@@ -1,14 +1,20 @@
-const { ipcMain } = require("electron");
 const settings = require("electron-settings");
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
 const {exec} = require("child_process");
+const { ipcMain } = require("electron");
 
-const printerValue = () => {
+const {logError} = require("../services/errorLogger");
+
+/**
+ * @param mainWindow {Electron.CrossProcessExports.BrowserWindow}
+ */
+const printerValue = ({ mainWindow }) => {
     ipcMain.on('printerValue', async (event, data) => {
+        console.log('Received printer details', {data})
+
         if(data.length) {
-            console.log('Received printer details', {data})
             await settings.set('printer', {
                 name: data[0],
             });
@@ -23,10 +29,11 @@ const printerValue = () => {
 
 
     ipcMain.on('checkLoader', async function (event, arg) {
-        startPrinter();
+        console.log('checkLoader')
+        await startPrinter();
 
         //if printer name is set close it
-        printerName = await settings.has('printer.name');
+        const printerName = await settings.has('printer.name');
         if(!printerName) {
             return;
         }
@@ -34,11 +41,16 @@ const printerValue = () => {
     });
 
     const startPrinter = async () => {
-        const loopStart = setInterval(async() => {
+        console.log('startPrinter started')
+
+        setInterval(async() => {
+
             try {
-                authToken = await settings.has('auth.token');
-                accountId =  await settings.has('auth.accountId');
-                printerName = await settings.has('printer.name');
+                let authToken = await settings.has('auth.token');
+                let accountId =  await settings.has('auth.accountId');
+                let printerName = await settings.has('printer.name');
+
+                console.log('startPrinter debug 1', {authToken, accountId, printerName})
 
                 if(!authToken || !accountId || !printerName) {
                     return;
@@ -47,8 +59,7 @@ const printerValue = () => {
                 authToken = await settings.get('auth.token');
                 accountId =  await settings.get('auth.accountId');
                 printerName = await settings.get('printer.name');
-
-                //console.log(await settings.has('auth.token'), await settings.has('auth.accountId'), await settings.has('printer.name'));
+                
                 const config = {
                     method: 'post',
                     url: 'https://api.shift.online/business-dashboard/v1/printer/autoPrint',
@@ -59,6 +70,8 @@ const printerValue = () => {
                         accountId : accountId
                     }
                 };
+
+                console.log('startPrinter config', { config })
 
                 const response = await axios(config);
                 await response.data.forEach(async(item, count) => {
@@ -74,7 +87,7 @@ const printerValue = () => {
                     });
                 });
             } catch (error) {
-                mainWindow.webContents.send('error', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+                logError(error)
             }
         }, 2000);
     }
@@ -88,7 +101,7 @@ const printerValue = () => {
      */
     const execPromise = (command, count = 1, log = 'label') => {
         const promises = [];
-        for (i = 0; i < count; ++i) {
+        for (let i = 0; i < count; ++i) {
             promises.push(new Promise((resolve, reject) => {
                 exec(command, (error, stdout, stderr) => {
                     if (error) {

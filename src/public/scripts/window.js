@@ -56,7 +56,11 @@ ipc.on('update_downloaded', () => {
 });
 
 ipc.on('error', (error, message) => {
-   console.log(message);
+   console.error(message);
+});
+
+ipc.on('info', (error, message) => {
+    console.log(message);
 });
 
 /**
