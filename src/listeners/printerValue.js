@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const {exec} = require("child_process");
 const { ipcMain } = require("electron");
+const hostName = require('os').hostname();
 
 const {logError} = require("../services/errorLogger");
 
@@ -71,18 +72,19 @@ const printerValue = ({ mainWindow }) => {
                     }
                 };
 
-                console.log('startPrinter config', { config })
+                if (!fs.existsSync('C:\\shiftLabels\\')){
+                    fs.mkdirSync('C:\\shiftLabels\\');
+                }
+                
 
                 const response = await axios(config);
                 await response.data.forEach(async(item, count) => {
-                    let pageDirectory = __dirname.replace('app.asar', 'app.asar.unpacked')
-                    pageDirectory = pageDirectory.replace('\src', '');
                     // Write File#
-                    await fs.writeFileSync(path.join(pageDirectory, count + ".txt"), item ,"UTF8",{ flag: 'wx' })
+                    await fs.writeFileSync(path.join('C:\\shiftLabels\\', count + ".txt"), item ,"UTF8",{ flag: 'wx' })
                     // Print File
-                    await execPromise('COPY /B '+ path.join(pageDirectory, count + ".txt") + ' "\\\\' + hostName + '\\' + printerName +'"', 1);
+                    await execPromise('COPY /B '+ path.join('C:\\shiftLabels\\', count + ".txt") + ' "\\\\' + hostName + '\\' + printerName +'"', 1);
                     // Delete File
-                    fs.unlink(path.join(pageDirectory, count + ".txt"), function (err) {
+                    fs.unlink(path.join('C:\\shiftLabels\\', count + ".txt"), function (err) {
                         if (err) throw err;
                     });
                 });

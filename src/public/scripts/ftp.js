@@ -1,8 +1,11 @@
 ipc.on('ftpDetails', function (event, response) {
     console.log('Received ftpDetails', {response})
     try {
-        const {ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort} = response
+        if(!response) {
+            return;
+        }
 
+        const {ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort} = response
         document.getElementById('ftp_host').value = ftpHost
         document.getElementById('ftp_port').value = ftpPort
         document.getElementById('ftp_username').value = ftpUsername

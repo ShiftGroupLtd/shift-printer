@@ -43,7 +43,13 @@ const startFileWatcher = async ({ mainWindow }) => {
 
         try {
             const ftpDetails = await getFtpDetails()
+
+            if(ftpDetails == null) {
+                return;  
+            }
+
             const {ftpPath: path} = ftpDetails
+
 
             if (validatePath(path)) {
 
