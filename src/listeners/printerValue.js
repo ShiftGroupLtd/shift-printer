@@ -18,6 +18,7 @@ const printerValue = ({ mainWindow }) => {
         if(data.length) {
             await settings.set('printer', {
                 name: data[0],
+                location: data[1],
             });
 
             console.log('Send actionReplySuccess')
@@ -50,6 +51,7 @@ const printerValue = ({ mainWindow }) => {
                 let authToken = await settings.has('auth.token');
                 let accountId =  await settings.has('auth.accountId');
                 let printerName = await settings.has('printer.name');
+                let printerLocation = await settings.has('printer.location');
 
                 console.log('startPrinter debug 1', {authToken, accountId, printerName})
 
@@ -60,23 +62,33 @@ const printerValue = ({ mainWindow }) => {
                 authToken = await settings.get('auth.token');
                 accountId =  await settings.get('auth.accountId');
                 printerName = await settings.get('printer.name');
-                
+
+                if(printerLocation) {
+                    data = {
+                        accountId : accountId,
+                        location : await settings.get('printer.location')
+                    }
+                } else {
+                    data = {
+                        accountId : accountId
+                    }
+                }
+
+                console.log('url', {url})
+
                 const config = {
                     method: 'post',
                     url: 'https://api.shift.online/business-dashboard/v1/printer/autoPrint',
                     headers: {
                         'Authorization': "Bearer " + authToken
                     },
-                    data : {
-                        accountId : accountId
-                    }
+                    data
                 };
 
                 if (!fs.existsSync('C:\\shiftLabels\\')){
                     fs.mkdirSync('C:\\shiftLabels\\');
                 }
                 
-
                 const response = await axios(config);
                 await response.data.forEach(async(item, count) => {
                     // Write File#

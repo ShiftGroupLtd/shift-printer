@@ -12,7 +12,7 @@ document.getElementById("printer").addEventListener('input', (item) => {
 
 document.getElementById("submitBtn").addEventListener('click', (event) => {
     event.preventDefault();
-    ipc.send('printerValue', [document.getElementById("printer").value]);
+    ipc.send('printerValue', [document.getElementById("printer").value, document.getElementById("printer_location").value]);
 });
 
 
