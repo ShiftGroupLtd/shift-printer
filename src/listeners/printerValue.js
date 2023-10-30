@@ -74,8 +74,6 @@ const printerValue = ({ mainWindow }) => {
                     }
                 }
 
-                console.log('url', {url})
-
                 const config = {
                     method: 'post',
                     url: 'https://api.shift.online/business-dashboard/v1/printer/autoPrint',
