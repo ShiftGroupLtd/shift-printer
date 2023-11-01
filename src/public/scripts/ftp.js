@@ -5,13 +5,14 @@ ipc.on('ftpDetails', function (event, response) {
             return;
         }
 
-        const {ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort} = response
+        const {ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort, ftpOfflinePrinting} = response
         document.getElementById('ftp_host').value = ftpHost
         document.getElementById('ftp_port').value = ftpPort
         document.getElementById('ftp_username').value = ftpUsername
         document.getElementById('ftp_password').value = ftpPassword
         document.getElementById('ftp_path').value = ftpPath
         document.getElementById('ftp_target_path').value = ftpTargetPath
+        document.getElementById('ftp_offline_printing').value = ftpOfflinePrinting
 
         ui.advancedSettings.show()
     }
@@ -94,12 +95,12 @@ ui.ftpSaveButton.element.addEventListener('click', (event) => {
 });
 
 function getFtpSendToServerCredentialArgsArray() {
-    const {ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort} = getFtpInputs()
-    return [ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, parseInt(ftpPort)]
+    const {ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort, ftpOfflinePrinting} = getFtpInputs()
+    return [ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, parseInt(ftpPort), ftpOfflinePrinting]
 }
 
 /**
- * @returns {{ftpHost: string, ftpUsername: string, ftpPassword: string, ftpPath: string, ftpPort: string, ftpTargetPath: string}}
+ * @returns {{ftpHost: string, ftpUsername: string, ftpPassword: string, ftpPath: string, ftpPort: string, ftpTargetPath: string, ftpTargetPath: string, ftpOfflinePrinting: string}}
  */
 function getFtpInputs() {
     const ftpHost = document.getElementById('ftp_host').value,
@@ -107,8 +108,9 @@ function getFtpInputs() {
         ftpUsername = document.getElementById('ftp_username').value,
         ftpPassword = document.getElementById('ftp_password').value,
         ftpPath = document.getElementById('ftp_path').value,
-        ftpTargetPath = document.getElementById('ftp_target_path').value;
-    return {ftpHost, ftpPort, ftpUsername, ftpPassword, ftpPath, ftpTargetPath }
+        ftpTargetPath = document.getElementById('ftp_target_path').value,
+        ftpOfflinePrinting = document.getElementById('ftp_offline_printing').value;
+    return {ftpHost, ftpPort, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpOfflinePrinting }
 }
 
 /**

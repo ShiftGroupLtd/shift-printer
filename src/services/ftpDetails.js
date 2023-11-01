@@ -13,7 +13,8 @@ async function getSftpDetails()
 
     const defaults = {
         ftpPath: 'C:\\',
-        ftpTargetPath: '/'
+        ftpTargetPath: '/',
+        ftpOfflinePrinting: 'off'
     }
 
     const data = await settings.get(settingsKey)
@@ -24,7 +25,7 @@ async function getSftpDetails()
     }
 }
 
-async function updateSftpDetails({ ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort })
+async function updateSftpDetails({ ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort, ftpOfflinePrinting})
 {
     // Remove trailing / on ftpTargetPath
     // It as added on automatically when it comes to uploading.
@@ -39,6 +40,7 @@ async function updateSftpDetails({ ftpHost, ftpUsername, ftpPassword, ftpPath, f
         ftpPath,
         ftpTargetPath,
         ftpPort,
+        ftpOfflinePrinting
     })
 }
 

@@ -12,7 +12,7 @@ const successUploadsDirName = 'ftp_files_uploaded_successfully'
 const errorUploadsDirName = 'ftp_files_failed';
 const maxFileSizeMb = 10
 const acceptedFileTypes = []; // allow all
-const acceptedMimeTypes = ['text/plain'];
+const acceptedMimeTypes = ['text/plain', ['text/csv']];
 let validationError = null;
 
 /**

@@ -42,17 +42,15 @@
               <div class="card mt-3">
                 <div class="card-body">
                   <h5 class="card-title">SFTP Settings</h5>
-                  <p class="card-text mb-2">Enter your credentials below.</p>
                   <label class="form-label small-text" for="printer">Please read the <a target="_blank" href="https://docs.google.com/document/d/e/2PACX-1vQF-scnWJ20Xcalf6zqYpMJJ7FWi89gVvTP2-zoP--rLV-U5FUSjlQGEQCXdAj9D11eQl8Y9eI7TDxL/pub">SFTP User Guide</a> before using. </label>
-
                   <hr class="my-3" />
 
                   <div class="row">
                     <div class="col-12 col-sm-6 col-md-8">
                       <label for="ftp_host">Host</label>
-                      <br /><small><strong>Example</strong>: sftp.example.com</small>
+                      <br /><small><strong>Example</strong>: sftp.tpeweb.co.uk</small>
                       <div class="input-group mb-3">
-                        <input type="text" name="ftp_host" class="form-control" id="ftp_host">
+                        <input placeholder="sftp.tpeweb.co.uk" type="text" name="ftp_host" class="form-control" id="ftp_host">
                       </div>
                     </div>
                     <div class="col-12 col-sm-6 col-md-4">
@@ -64,15 +62,24 @@
                     </div>
                   </div>
 
-                  <label for="ftp_username">Username</label>
-                  <div class="input-group mb-3">
-                    <input type="text" name="ftp_username" class="form-control" id="ftp_username">
-                  </div>
 
-                  <label for="ftp_password">Password</label>
-                  <div class="input-group mb-3">
-                    <input type="password" name="ftp_password" class="form-control" id="ftp_password">
+                  <div class="row">
+                    <div class="col-12 col-sm-6 col-md-6">
+                      <label for="ftp_username">Username</label>
+                     
+                      <div class="input-group mb-3">
+                        <input type="text" name="ftp_username" class="form-control" id="ftp_username">
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-6">
+                      <label for="ftp_port">Password</label>
+                     
+                      <div class="input-group mb-3">
+                        <input type="password" name="ftp_password" class="form-control" id="ftp_password">
+                      </div>
+                    </div>
                   </div>
+               
 
                   <label for="ftp_path">Local Path</label>
                   <br /><small><strong>Example</strong>: <i>C:\Users\JohnSmith\FtpFiles</i></small>
@@ -80,12 +87,15 @@
                     <input type="text" name="ftp_path" class="form-control" id="ftp_path"/>
                   </div>
 
-                  <label for="ftp_target_path">Server Target Path</label>
-                  <br /><small><strong>Example</strong>: <i>/home/john/</i></small>
-                  <div class="input-group mb-3">
-                    <input type="text" name="ftp_target_path" class="form-control" id="ftp_target_path"/>
+              
+                  <div style="display: none;" class="input-group mb-3">
+                    <input type="text" value="/" name="ftp_target_path" class="form-control" id="ftp_target_path"/>
                   </div>
 
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="ftp_offline_printing">
+                    <label class="form-check-label" for="ftp_offline_printing">Offline Printing</label>
+                  </div>
                 </div>
               </div>
 

@@ -26,8 +26,8 @@ const ftpListener = ({ mainWindow }) => {
     ipcMain.on('updateFtpDetails', async (event, data) => {
         console.log('updateFtpDetails', data)
 
-        const {ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort} = extractData(data)
-        await updateFtpDetailsService({ ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort })
+        const {ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort, ftpOfflinePrinting} = extractData(data)
+        await updateFtpDetailsService({ ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort, ftpOfflinePrinting })
 
         // Attempt connection to SFTP server
         if(await attemptConnection({
@@ -102,12 +102,12 @@ const attemptConnection = async ({successMessage, localPath, targetPath, ...cred
 
 /**
  * @param data
- * @returns {{ftpHost: string, ftpUsername: string, ftpPassword: string, ftpPath: string, ftpTargetPath: string, ftpPort: null}|*[]}
+ * @returns {{ftpHost: string, ftpUsername: string, ftpPassword: string, ftpPath: string, ftpTargetPath: string, ftpPort: null, ftpOfflinePrinting: string}|*[]}
  */
 const extractData = (data) => {
     try {
-        const [ftpHost = '', ftpUsername = '', ftpPassword = '', ftpPath = '', ftpTargetPath = '', ftpPort = null] = data
-        return { ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort }
+        const [ftpHost = '', ftpUsername = '', ftpPassword = '', ftpPath = '', ftpTargetPath = '', ftpPort = null, ftpOfflinePrinting = 'off'] = data
+        return { ftpHost, ftpUsername, ftpPassword, ftpPath, ftpTargetPath, ftpPort, ftpOfflinePrinting}
     }
     catch (err) {
         logError(err)
