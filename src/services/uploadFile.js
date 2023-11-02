@@ -240,12 +240,11 @@ const validateUploadFile = (filePath) => {
         return false;
     }
 
-    const fileMimeType = mime.getType(filePath); // Get the MIME type of the file
-
-    if (acceptedMimeTypes.length && !acceptedMimeTypes.includes(fileMimeType)) {
-        validationError = 'MIME type is not accepted. ('+fileMimeType+')';
-        return false;
-    }
+    // const fileMimeType = mime.getType(filePath); // Get the MIME type of the file
+    // if (acceptedMimeTypes.length && !acceptedMimeTypes.includes(fileMimeType)) {
+    //     validationError = 'MIME type is not accepted. ('+fileMimeType+')';
+    //     return false;
+    // }
 
     return true;
 };
