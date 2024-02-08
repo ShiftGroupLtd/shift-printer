@@ -15,7 +15,6 @@ const ftpListener = ({ mainWindow }) => {
      * Sends FTP details to UI.
      */
     ipcMain.on('ftpDetails', async (event) => {
-        console.log('Received ftpDetails request')
         const ftpDetails = await getFtpDetails()
         event.sender.send('ftpDetails', ftpDetails);
     });

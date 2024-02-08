@@ -1,0 +1,54 @@
+^XA
+            ~SD15^PR12^LH0,0
+            ^FO25,15^GB760,985,2^FS
+            ^FO35,35^A0N,80,80^FDP1^FS
+            ^FO600,25^A0N,70,80^FDSHF^FS
+            ^FO600,85^A0N,30,60^FDBN17^FS
+
+            ^FO25,115^GB760,2,2^FS
+            ^FO35,125^A0N,40,45^FD2D377T^FS
+            ^FO35,165^A0N,25,30^FDConsignment Ref:^FS
+            ^FO35,192^ABN,40,15^FB355,2,,L,,^FDtestRA233432^FS
+            ^FO390,115^GB2,155,2^FS
+
+            ^FO395,125^A0N,20,25^FB310,2,,L,,^FDTuffnells Parcels Express Ltd^FS
+            ^FO395,170^A0N,20,25^FB310,2,,L,,^FDTuffnells Parcels Express Ltd^FS
+            ^FO395,209^A0N,25,25^FD^FS
+            ^FO395,215^A0N,20,25^FDSheffield^FS
+            ^FO395,245^A0N,20,25^FD S9 2EQ^FS
+            ^FO25,270^GB685,2,2^FS
+
+            ^FO277,280^A0N,25,30^FDDeliver To^FS
+            ^FO277,310^A0N,45,35^FB415,2,,L,,^FDtuffnells^FS
+            ^FO277,405^A0N,45,35^FB415,2,,L,,^FDTuffnells Parcels Express Ltd^FS
+            ^FO277,505^A0N,45,35^FB415,2,,L,,^FDShepcote House, Shepcote Lane^FS
+            ^FO277,600^A0N,45,35^FB415,2,,L,,^FD^FS
+            ^FO277,695^A0N,45,35^FDSheffield^FS
+            ^FO277,745^A0N,45,35^FD^FS
+            ^FO277,805^A0N,67,64^FDS9 1UW^FS
+            ^FO277,890^A0N,25,30^FDTel:^FS
+            ^FO340,880^A0N,39,36^FD1234567890^FS
+
+
+            ^FO270,270^GB2,645,2^FS
+            ^FO35,280^A0N,25,30^FDItem^FS
+            ^FO35,310^A0N,45,50^FD1/1^FS
+
+            
+
+            ^FO35,440^A0N,25,30^FDTotal Weight Kg^FS
+            ^FO35,470^A0N,45,50^FD0^FS
+            ^FO35,525^A0N,25,30^FDDespatched^FS
+            ^FO35,565^A0N,45,50^FD06/02/24^FS
+            ^FO25,610^GB245,2,2^FS
+
+            ^FO35,615
+                ^BQR,2,7,H,7^FDQA,921e3b35-96d8-4e43-b050-91ee5cca78fa^FS
+
+            ^FO105,875^A0N,40,55^FDMBOX^FS
+            ^FO25,915^GB685,2,2^FS
+            ^FO35,925^A0N,48,40^FB680,3,,L,,^FDLeave with a neighbour^FS
+            ^FO710,115^GB2,880,2^FS
+            ^FO723,125^BY2^BCB,50,N,N,N,A^FD921e3b35-96d8-4e43-b050-91ee5cca78fa^FS
+            ^PQ1,0,1
+            ^XZ

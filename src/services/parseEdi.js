@@ -39,13 +39,13 @@ class EdiParser {
                     bookingData[key] = trimmedValue !== '' ? trimmedValue : null;
                 }
 
-                if (this.options.schemaName === `${TuffnellsEdiSchemas}::VERSION_TWO_TXT`) {
-                    const accountSequentialBarcode = this.accountSequentialBarcodeService
-                        .findOrCreateAccountSequentialBarcode(bookingData.accountNumber.replace(/^0+/, ''), context.ftpUserId);
+                // if (this.options.schemaName === `${TuffnellsEdiSchemas}::VERSION_TWO_TXT`) {
+                //     const accountSequentialBarcode = this.accountSequentialBarcodeService
+                //         .findOrCreateAccountSequentialBarcode(bookingData.accountNumber.replace(/^0+/, ''), context.ftpUserId);
 
-                    bookingData.sequentialBarcodeNumber = accountSequentialBarcode.dailySequentialBarcodeNumber.toString().padStart(4, '0');
-                    accountSequentialBarcode.increment('dailySequentialBarcodeNumber');
-                }
+                //     bookingData.sequentialBarcodeNumber = accountSequentialBarcode.dailySequentialBarcodeNumber.toString().padStart(4, '0');
+                //     accountSequentialBarcode.increment('dailySequentialBarcodeNumber');
+                // }
 
                 CreateBookingFromEdi.dispatch(bookingData, this.options, context);
             }
