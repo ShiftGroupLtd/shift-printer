@@ -14,26 +14,27 @@ const acceptedFileTypes = []; // allow all
 const acceptedMimeTypes = ['text/plain', 'text/csv'];
 let validationError = null;
 
-const uploadFiles = async (mainWindow, basePath, filePaths) => {
-    const filePathsCopy = [...filePaths];
+const uploadFiles = async (mainWindow, basePath, [...filePaths]) => {
+
     const pendingUploadsPath = path.join(path.dirname(basePath), pendingFilesDirName);
-    for (const filePath of filePaths) {
+    
+    const pendingFilePaths = filePaths.map((filePath) => {
         const fileName = path.basename(filePath);
 
         // Validate the file before proceeding
         if (!validateUploadFile(filePath)) {
             updateStatusBar({ mainWindow, text: `Invalid file: ${fileName}. Reason: ${validationError}`, type: 'danger' });
-            continue; // Skip to the next file
+            return null; // Skip to the next file
         }
 
         const moveFilePending = path.basename(filePath);
         const newFilePath = path.join(pendingUploadsPath, moveFilePending);
         fsExtra.renameSync(filePath, newFilePath); // 
-
-    }
+        return newFilePath;
+    }).filter((path) => path !== null);
 
     try {
-        await uploadFilesFTP(mainWindow, filePathsCopy, basePath);
+        await uploadFilesFTP(mainWindow, pendingFilePaths, basePath);
         updateStatusBar({ mainWindow, text: `Uploaded files: ${new Date()}`, type: 'success' });
     } catch (error) {
         updateStatusBar({ mainWindow, text: `Error uploading files: ${error}`, type: 'danger' });
@@ -41,36 +42,36 @@ const uploadFiles = async (mainWindow, basePath, filePaths) => {
 };
 
 const uploadFilesFTP = async (mainWindow, filePaths, basePath) => {
-
     const ftpDetails = await getSftpDetails();
     const { ftpHost, ftpUsername, ftpPassword, ftpPort, ftpTargetPath } = ftpDetails;
 
     await connect({ host: ftpHost, username: ftpUsername, password: ftpPassword, port: ftpPort });
 
-    await Promise.allSettled(filePaths.map(async (filePath) => {
-        const fileName = path.basename(filePath);
-        const targetPath = `${ftpTargetPath}/${fileName}`;
-        const basePathParts = basePath.split('/');
-        basePathParts.pop();
-        let newBasePath = basePathParts.join('/') + '/';
+    await Promise.all(
+        filePaths.map(async (filePath) => {
+            const fileName = path.basename(filePath);
 
-        const lastIndex = filePath.lastIndexOf('/');
-        const fileNameEnding = filePath.substring(lastIndex + 1);
+            
+            const targetPath = path.join(ftpTargetPath, fileName);
+            
+            const lastIndex = filePath.lastIndexOf(path.sep);
+            const fileNameEnding = filePath.substring(lastIndex + 1);
+            try {
+                await getClient().fastPut(filePath, targetPath);
+                updateStatusBar({ mainWindow, text: `File Uploaded: ${fileNameEnding}`, type: 'success' });
+            } catch (error) {
+                logError(error, `Error uploading file "${fileName}" to FTP server: ${error.message}`);
+                throw error;
+            }
+        })
+    );
 
-        try {
-            await getClient().fastPut(`${newBasePath}ftp_files_pending/${fileNameEnding}`, targetPath);
-            updateStatusBar({ mainWindow, text: `File Uploaded: ${fileNameEnding}`, type: 'success' });
-        } catch (error) {
-            logError(error, `Error uploading file "${fileName}" to FTP server: ${error.message}`);
-            throw error;
-        }
-    }));
-
-    var lastIndex = basePath.lastIndexOf('/');
+    const lastIndex = basePath.lastIndexOf(path.sep);
     // Remove anything after the last '/'
-    var basePathModified = basePath.substring(0, lastIndex);
+    const basePathModified = basePath.substring(0, lastIndex);
     // Clear the pending directory just before closing the FTP client
-    const pendingDirectory = `${basePathModified}/ftp_files_pending`;
+    const pendingDirectory = `${basePathModified}${path.sep}ftp_files_pending`;
+
     try {
         const pendingFiles = await fs.readdir(pendingDirectory);
         await Promise.all(pendingFiles.map(async (file) => {
@@ -111,3 +112,4 @@ const validateUploadFile = (filePath) => {
 module.exports = {
     uploadFiles,
 };
+

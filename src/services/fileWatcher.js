@@ -39,8 +39,7 @@ const startFileWatcher = async ({ mainWindow }) => {
             if(ftpDetails == null) {
                 return;  
             }
-
-            const {ftpPath: path} = ftpDetails;
+            const path = ftpDetails.ftpPath;
 
             if (validatePath(path)) {
                 await createFolder('ftp_files_pending', path);
@@ -140,3 +139,4 @@ module.exports = {
     stopFileWatcher,
     validatePath,
 };
+
